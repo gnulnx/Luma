@@ -78,6 +78,10 @@ try {
     await page
       .getByRole("button", { name: "Close settings", exact: true })
       .click();
+    const savedEnergy = await page.locator("#speed").inputValue();
+    await page.getByLabel("Choose a world").selectOption("aurora");
+    await expect(page.getByLabel("Choose a world")).toBeEnabled();
+    await expect(page.locator("#speed")).toHaveValue(savedEnergy);
     for (const id of ["aurora", "ocean", "ember", "prism"]) {
       await page.getByLabel("Choose a world").selectOption(id);
       await expect(page.getByLabel("Choose a world")).toBeEnabled();

@@ -149,6 +149,7 @@ export class Universe {
     this.settings = { speed: 1, glow: 0.7, trails: 0.65, size: 1 };
     this.paused = false;
     this.pending = false;
+    this.loadId = 0;
     this.lastFrame = performance.now();
     this.lastStep = this.lastFrame;
     this.lastStats = this.lastFrame;
@@ -217,7 +218,13 @@ export class Universe {
   }
 
   async load(preset, count, seed) {
-    this.worker?.terminate();
+    const previousWorker = this.worker;
+    if (previousWorker) {
+      previousWorker.onmessage = null;
+      previousWorker.onerror = null;
+      previousWorker.terminate();
+    }
+    const loadId = ++this.loadId;
     if (this.points) {
       this.scene.remove(this.points);
       this.points.geometry.dispose();
@@ -287,6 +294,7 @@ export class Universe {
         reject(new Error(event.message));
       };
       this.worker.onmessage = ({ data }) => {
+        if (loadId !== this.loadId) return;
         this.pending = false;
         this.recycleBuffer = this.target?.buffer;
         this.target = data.positions;
@@ -437,7 +445,9 @@ export class Universe {
         positions[k + 1] += (this.target[j + 1] - positions[k + 1]) * blend;
       }
       this.points.geometry.attributes.position.needsUpdate = true;
-      if (!this.pending && now - this.lastStep >= 1000 / 30) {
+      // Physics runs at 20 Hz and the renderer interpolates between frames.
+      // This keeps a 12k-particle world visually fluid without monopolizing a CPU core.
+      if (!this.pending && now - this.lastStep >= 1000 / 20) {
         this.pending = true;
         const simulationDt =
           Math.min((now - this.lastStep) / 1000, 1 / 15) * this.settings.speed;
@@ -501,7 +511,12 @@ export class Universe {
 
   dispose() {
     cancelAnimationFrame(this.animation);
-    this.worker?.terminate();
+    this.loadId++;
+    if (this.worker) {
+      this.worker.onmessage = null;
+      this.worker.onerror = null;
+      this.worker.terminate();
+    }
     this.scene.traverse((object) => {
       object.geometry?.dispose();
       object.material?.dispose();

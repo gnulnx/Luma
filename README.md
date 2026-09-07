@@ -25,9 +25,9 @@ For a TV, connect the computer by HDMI, mirror/cast its display, or open the ter
 | Ember dance     | Warm, spirited vortices of gold, coral, and flame      |
 | Prismatic       | Six colorful arms that curl, chase, and reorganize     |
 
-Choose a world from the bottom dropdown. Open **Settings** for color palettes, energy, glow, trails, particle size, and detail. Adaptive detail starts with 12,000 particles on larger devices and 5,000 on smaller devices, and reduces load when performance stays low. Rich and Ultra explicitly select 12,000 and 20,000 particles. Actual performance depends on the browser, GPU, and display resolution.
+Choose a world from the bottom dropdown. Open **Settings** for color palettes, energy, glow, trails, particle size, and detail. Energy ranges from a nearly still **0.05× drift** to 2× spirited motion. Adaptive detail starts with 12,000 particles on larger devices and 5,000 on smaller devices, and reduces load when performance stays low. Rich and Ultra explicitly select 12,000 and 20,000 particles. Actual performance depends on the browser, GPU, and display resolution.
 
-Turn on **Let it wander** for a new world every 90 seconds. Automatic changes wait while settings are open, the simulation is paused, or the page is hidden. Your settings are saved in the current browser when local storage is available. Reimagining preserves your adjustments; selecting a different world loads that world’s tuned defaults.
+Turn on **Let it wander** for a new world every 90 seconds. Automatic changes wait while settings are open, the simulation is paused, or the page is hidden. Your settings are saved in the current browser when local storage is available. Reimagining and changing scenes preserve your energy, glow, trails, particle size, palette, detail, and zoom. **Restore this world’s defaults** is the explicit reset when you want the new scene’s tuned starting point.
 
 Scroll over the scene or pinch with two fingers to zoom from **0.5× to 6×**. Zoom follows the pointer or pinch midpoint, enlarging both particles and whole clumps. Two-finger dragging also moves the zoomed view. **Scene zoom** in Settings provides a slider, and **Reset view** returns to the centered 1× view. Zoom is saved and stays in place when switching worlds. Particle size remains a separate control for the size of individual dots.
 
@@ -64,6 +64,8 @@ npm run test:zoom
 ## How it works
 
 Every displayed life particle has its own position, velocity, and one of six species. A Web Worker calculates local asymmetric attraction and short-range repulsion using a spatial grid. Soft vortices and currents provide each preset’s composition; this is an artistic particle-life simulation, not a scientific model or a prerecorded animation. Particle positions interpolate smoothly between worker updates. Three.js renders additive point sprites, time-based history trails, bloom, and a sparse starfield.
+
+The physics worker updates at a measured 20 Hz while the renderer interpolates every display frame. This keeps long-running 12,000-particle scenes fluid without keeping a CPU core busy continuously. When adaptive detail detects sustained low performance, it moves to the 5,000-particle mode and lowers the render scale. Switching worlds detaches the previous worker before starting the next one.
 
 - `src/physics.js`: particle-life forces, spatial grid, and composition currents.
 - `src/presets.js`: palettes and tuning.

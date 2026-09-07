@@ -178,7 +178,7 @@ function updatePalette() {
     `radial-gradient(circle at 25% 25%,${PALETTES[palette][5]},${PALETTES[palette][2]} 35%,${PALETTES[palette][0]} 75%,#13232a)`;
 }
 
-async function loadWorld(index, { keepSettings = false, first = false } = {}) {
+async function loadWorld(index, { keepSettings = true, first = false } = {}) {
   if (loadingWorld) return;
   loadingWorld = true;
   $("preset").disabled = true;
@@ -186,7 +186,7 @@ async function loadWorld(index, { keepSettings = false, first = false } = {}) {
   $("quality").disabled = true;
   presetIndex = (index + PRESETS.length) % PRESETS.length;
   const preset = PRESETS[presetIndex];
-  if (!keepSettings) {
+  if (!keepSettings || (first && !saved.settings)) {
     for (const key of Object.keys(settings)) settings[key] = preset[key];
     $("mood").value = "original";
   }
@@ -312,7 +312,7 @@ function scheduleTour() {
   if ($("tour").checked && !universe.paused)
     tourTimer = setTimeout(() => {
       if (settingsOpen || document.hidden) scheduleTour();
-      else loadWorld(presetIndex + 1);
+      else loadWorld(presetIndex + 1, { keepSettings: true });
     }, 90000);
 }
 
@@ -352,7 +352,10 @@ try {
 
 if (universe) {
   $("preset").addEventListener("change", () =>
-    loadWorld(PRESETS.findIndex((p) => p.id === $("preset").value)),
+    loadWorld(
+      PRESETS.findIndex((p) => p.id === $("preset").value),
+      { keepSettings: true },
+    ),
   );
   $("shuffle").addEventListener("click", () => {
     loadWorld(presetIndex, { keepSettings: true });
@@ -392,7 +395,7 @@ if (universe) {
   });
   $("reset").addEventListener("click", () => {
     changeZoom(1);
-    loadWorld(presetIndex);
+    loadWorld(presetIndex, { keepSettings: false });
     toast("Back to its natural state.");
   });
   window.addEventListener("resize", () => universe.resize());
@@ -556,12 +559,12 @@ if (universe) {
         break;
       case "arrowright":
         event.preventDefault();
-        loadWorld(presetIndex + 1);
+        loadWorld(presetIndex + 1, { keepSettings: true });
         showControls();
         break;
       case "arrowleft":
         event.preventDefault();
-        loadWorld(presetIndex - 1);
+        loadWorld(presetIndex - 1, { keepSettings: true });
         showControls();
         break;
     }
