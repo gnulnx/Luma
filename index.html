@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#06080c" />
+    <meta
+      name="description"
+      content="A little universe, endlessly becoming. Luma is an immersive particle-life experience with luminous color and emergent motion."
+    />
+    <title>Luma — a little universe</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <main id="app">
+      <canvas
+        id="universe"
+        aria-label="An evolving universe of colorful, interacting particles"
+      ></canvas>
+      <div class="vignette" aria-hidden="true"></div>
+      <header class="chrome masthead">
+        <a class="brand" href="/" aria-label="Luma home">
+          <svg
+            class="brand-mark"
+            viewBox="0 0 40 40"
+            fill="none"
+            aria-hidden="true"
+          >
+            <circle cx="20" cy="20" r="3" fill="currentColor" />
+            <g fill="currentColor">
+              <circle cx="20" cy="6" r="2" />
+              <circle cx="32" cy="13" r="2" />
+              <circle cx="32" cy="27" r="2" />
+              <circle cx="20" cy="34" r="2" />
+              <circle cx="8" cy="27" r="2" />
+              <circle cx="8" cy="13" r="2" />
+            </g>
+            <circle
+              cx="20"
+              cy="20"
+              r="9"
+              stroke="currentColor"
+              stroke-width=".6"
+              opacity=".4"
+            />
+          </svg>
+          <span>LUMA<small>PARTICLE LIFE</small></span>
+        </a>
+        <div class="live-status">
+          <span class="live-dot"></span
+          ><span id="live-label">A LITTLE UNIVERSE, ENDLESSLY BECOMING</span>
+        </div>
+        <button
+          id="settings-open"
+          class="glass-button"
+          aria-label="Open settings"
+          aria-controls="settings-panel"
+          aria-expanded="false"
+        >
+          <span data-icon="sliders"></span><span>Settings</span>
+        </button>
+      </header>
+
+      <section class="chrome scene-caption" aria-live="polite">
+        <div class="eyebrow">
+          <span id="scene-number">01</span><span class="caption-line"></span
+          ><span>THE LIVING COLLECTION</span>
+        </div>
+        <h1 id="scene-title">Cosmic bloom</h1>
+        <p id="scene-description">Somewhere between a galaxy and a daydream.</p>
+        <div id="palette-dots" class="palette-dots" aria-hidden="true"></div>
+      </section>
+
+      <nav class="chrome control-dock" aria-label="Simulation controls">
+        <div class="preset-control">
+          <span class="preset-orb" aria-hidden="true"></span
+          ><label class="sr-only" for="preset">Choose a world</label
+          ><select id="preset"></select
+          ><span data-icon="chevron" class="select-arrow"></span>
+        </div>
+        <span class="dock-divider"></span>
+        <button
+          id="shuffle"
+          class="icon-button"
+          aria-label="Reimagine this world"
+          title="Reimagine · R"
+        >
+          <span data-icon="shuffle"></span>
+        </button>
+        <button
+          id="pause"
+          class="icon-button"
+          aria-label="Pause simulation"
+          title="Pause · Space"
+        >
+          <span data-icon="pause"></span>
+        </button>
+        <span class="dock-divider"></span>
+        <button
+          id="fullscreen"
+          class="cinema-button"
+          aria-label="Enter fullscreen"
+          title="Fullscreen · F"
+        >
+          <span data-icon="expand"></span><span>Go fullscreen</span>
+        </button>
+      </nav>
+
+      <footer class="chrome footer">
+        <span class="interaction-hint"
+          ><span data-icon="pointer"></span>Touch the universe. See what
+          follows.</span
+        ><span class="footer-right"
+          ><span id="particle-count">12,000</span> particles
+          <span class="tiny-dot">·</span> infinite possibilities</span
+        >
+      </footer>
+      <button
+        id="wake-controls"
+        aria-label="Show controls"
+        tabindex="-1"
+      ></button>
+      <div id="toast" class="toast" role="status"></div>
+      <div id="loading" class="loading">
+        <span class="loading-orb"></span><span>A universe is taking shape</span>
+      </div>
+
+      <div id="panel-backdrop" class="panel-backdrop" hidden></div>
+      <aside
+        id="settings-panel"
+        class="settings-panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="settings-title"
+        hidden
+      >
+        <div class="panel-heading">
+          <div>
+            <span class="eyebrow">MAKE IT YOURS</span>
+            <h2 id="settings-title">A world of your own.</h2>
+          </div>
+          <button
+            id="settings-close"
+            class="icon-button"
+            aria-label="Close settings"
+          >
+            <span data-icon="close"></span>
+          </button>
+        </div>
+        <p class="panel-intro">A few small changes. A whole new feeling.</p>
+        <div class="settings-section">
+          <label class="range-label" for="zoom"
+            ><span>Scene zoom</span><output id="zoom-value">1.0×</output></label
+          >
+          <input
+            id="zoom"
+            aria-label="Scene zoom"
+            type="range"
+            min="0.5"
+            max="6"
+            step="0.05"
+            value="1"
+          />
+          <div class="range-extents">
+            <span>The whole universe</span><span>Up close</span>
+          </div>
+          <p class="panel-intro">Scroll or pinch to explore a clump.</p>
+          <button id="zoom-reset" class="reset-button">
+            <span data-icon="reset"></span>Reset view
+          </button>
+        </div>
+        <div class="settings-section">
+          <label class="field-label" for="mood">Color palette</label>
+          <div class="select-wrap">
+            <select id="mood">
+              <option value="original">World’s signature colors</option>
+              <option value="aurora">Northern lights</option>
+              <option value="rose">Rose quartz</option>
+              <option value="ocean">Electric ocean</option>
+              <option value="gold">Liquid gold</option></select
+            ><span data-icon="chevron"></span>
+          </div>
+          <label class="range-label" for="speed"
+            ><span>Energy</span><output id="speed-value">1.0×</output></label
+          ><input
+            id="speed"
+            type="range"
+            min="0.25"
+            max="2"
+            step="0.05"
+            value="1"
+          />
+          <div class="range-extents">
+            <span>Dreamy</span><span>Spirited</span>
+          </div>
+          <label class="range-label" for="glow"
+            ><span>Glow</span><output id="glow-value">70%</output></label
+          ><input
+            id="glow"
+            type="range"
+            min="0"
+            max="1.5"
+            step="0.05"
+            value="0.7"
+          />
+          <label class="range-label" for="trails"
+            ><span>Light trails</span
+            ><output id="trails-value">65%</output></label
+          ><input
+            id="trails"
+            type="range"
+            min="0"
+            max="1"
+            step="0.05"
+            value="0.65"
+          />
+          <label class="range-label" for="size"
+            ><span>Particle size</span
+            ><output id="size-value">1.0×</output></label
+          ><input
+            id="size"
+            type="range"
+            min="0.5"
+            max="2"
+            step="0.1"
+            value="1"
+          />
+        </div>
+        <div class="settings-section">
+          <label class="field-label" for="quality">Detail</label>
+          <div class="select-wrap">
+            <select id="quality">
+              <option value="auto">Adaptive · recommended</option>
+              <option value="low">Light · 5,000 particles</option>
+              <option value="high">Rich · 12,000 particles</option>
+              <option value="ultra">Ultra · 20,000 particles</option></select
+            ><span data-icon="chevron"></span>
+          </div>
+          <label class="toggle-row" for="tour"
+            ><span
+              ><strong>Let it wander</strong
+              ><small>A new world every 90 seconds</small></span
+            ><input id="tour" type="checkbox" role="switch" /><span
+              class="switch"
+              aria-hidden="true"
+            ></span
+          ></label>
+          <label class="toggle-row" for="auto-hide"
+            ><span
+              ><strong>Disappear into the scene</strong
+              ><small>Hide controls after a few quiet seconds</small></span
+            ><input id="auto-hide" type="checkbox" role="switch" checked /><span
+              class="switch"
+              aria-hidden="true"
+            ></span
+          ></label>
+        </div>
+        <button id="reset" class="reset-button">
+          <span data-icon="reset"></span>Restore this world’s defaults
+        </button>
+        <div class="keyboard-help">
+          <span><kbd>F</kbd> Fullscreen</span><span><kbd>Space</kbd> Pause</span
+          ><span><kbd>R</kbd> Reimagine</span
+          ><span><kbd>←</kbd><kbd>→</kbd> Worlds</span
+          ><span><kbd>H</kbd> Hide</span><span><kbd>S</kbd> Settings</span>
+          <span><kbd>+</kbd><kbd>−</kbd> Zoom</span
+          ><span><kbd>0</kbd> Reset view</span>
+        </div>
+        <div class="panel-foot">
+          <span class="live-dot"></span
+          ><span id="performance">Every particle has a mind of its own.</span>
+        </div>
+      </aside>
+      <div id="error" class="error-state" hidden>
+        <h2>This universe needs a little more light.</h2>
+        <p id="error-message"></p>
+        <button onclick="location.reload()" class="glass-button">
+          Try again
+        </button>
+      </div>
+    </main>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
